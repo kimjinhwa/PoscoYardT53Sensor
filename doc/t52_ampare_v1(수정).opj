@@ -1,0 +1,37 @@
+(ExpressProject ""
+  (ProjectVersion "19981106")
+  (ProjectType "PCB")
+  (Folder "Design Resources"
+    (Folder "Library")
+    (File ".\t52_ampare_v1(수정).dsn"
+      (Type "Schematic Design"))
+    (BuildFileAddedOrDeleted "x")
+    (CompileFileAddedOrDeleted "x")
+    (NoModify))
+  (Folder "Outputs")
+  (Folder "Referenced Projects")
+  (GlobalState
+    (FileView
+      (Path "Design Resources")
+      (Path "Design Resources" ".\t52_ampare_v1(수정).dsn")
+      (Path "Design Resources" ".\t52_ampare_v1(수정).dsn" "SCHEMATIC1")
+      (Select "Design Resources" ".\t52_ampare_v1(수정).dsn" "SCHEMATIC1"
+         "T52_AMPERE"))
+    (HierarchyView)
+    (Doc
+      (Type "COrCapturePMDoc")
+      (Frame
+        (Placement "44 0 1 -1 -1 -8 -31 0 200 0 610"))
+      (Tab 0))
+    (Doc
+      (Type "COrSchematicDoc")
+      (Frame
+        (Placement "44 2 3 -1 -1 -8 -31 52 1686 52 701")
+        (Scroll "0 0")
+        (Zoom "107")
+        (Occurrence "/"))
+      (Path
+         "C:\DEVWORK\4.IFTECHWORK\POSCOBMS\POSCOT52FRM\DOC\T52_AMPARE_V1(수정).DSN")
+      (Schematic "SCHEMATIC1")
+      (Page "T52_AMPERE")))
+  (PartMRUSelector))
