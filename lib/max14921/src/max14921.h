@@ -98,9 +98,10 @@ typedef struct {
   uint8_t   spiSamplB;
   uint8_t   spiDiag;
   uint8_t   spiLoPw;
-
   long   calParErrTmrValueMsec;
 
+  uint8_t   modbusBalanceC01_C08;
+  uint8_t   modbusBalanceC09_C16;
   //MD_AK35_USERCFG_T   usrCfg;
 
 } MD_AK35_INSTANCE_T;
@@ -163,6 +164,7 @@ public:
 	CellStatus openWireStatus;
 	void MD_AK35_ScanCell(bool calibrationData);
 	uint16_t readT123(T_NUMBER Tnumber);
+  float calTemperature(uint16_t adcData);
 	uint16_t readTotalVoltage();
 private:
 	long MD_AK35_SpiTransfer24(uint8_t byte1, uint8_t byte2, uint8_t byte3);
@@ -176,6 +178,15 @@ private:
 };
 extern max14921 _max14921;
 
+// 비트 순서 뒤집기 매크로 (SPI MSB First 전송 순서에 맞춤)
+#define REVERSE_BITS_8(x) (((x & 0x01) << 7) | \
+                           ((x & 0x02) << 5) | \
+                           ((x & 0x04) << 3) | \
+                           ((x & 0x08) << 1) | \
+                           ((x & 0x10) >> 1) | \
+                           ((x & 0x20) >> 3) | \
+                           ((x & 0x40) >> 5) | \
+                           ((x & 0x80) >> 7))
 
 #endif
 

@@ -1,8 +1,11 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define IO15 15
-#define LED_PORT IO15
+#define LED_PORT GPIO_NUM_15
+#define ASEL1 GPIO_NUM_32
+#define ASEL2 GPIO_NUM_25
+#define ASEL3 GPIO_NUM_27
+
 #define LED_ON digitalWrite(LED_PORT,LOW)
 #define LED_OFF digitalWrite(LED_PORT,HIGH)
 #define LED_TOGGLE digitalRead(LED_PORT) == HIGH ? LED_ON : LED_OFF

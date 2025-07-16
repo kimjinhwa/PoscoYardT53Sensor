@@ -1,4 +1,5 @@
-#define VERSION "1.3.5"  // Hole CT값을 CT Ratio로 사용하기 위하여 변경한다.  CT용량값을 정수로 기입한다.
+#define VERSION "0.9.0"  // make cell balance and add ASEL1, ASEL2, ASEL3 
+//#define VERSION "1.3.5"  // Hole CT값을 CT Ratio로 사용하기 위하여 변경한다.  CT용량값을 정수로 기입한다.
 //#define VERSION "1.3.4"  // platio 수정 
 //#define VERSION "1.3.3"  // Total gain을 따로 준다. 
 //#define VERSION "1.3.2"  // 전압을 읽을때 1번이상을 버려야 정확한 값을 읽는다. 

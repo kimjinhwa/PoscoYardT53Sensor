@@ -129,6 +129,16 @@ void useInterrupt(){
     timerAlarmWrite(timer, 1000, true); // 1000us = 1ms
     timerAlarmEnable(timer);
 }
+void initPin(){
+    pinMode(LED_PORT, OUTPUT);
+    LED_ON;
+    pinMode(SPICLOCK, OUTPUT);
+    digitalWrite(SPICLOCK, LOW);
+
+    pinMode(ASEL1, INPUT);
+    pinMode(ASEL2, INPUT);
+    pinMode(ASEL3, INPUT);
+}
 void setup()
 {
     Serial.begin(115200);
@@ -151,14 +161,10 @@ void setup()
     // Serial1.begin(9600, SERIAL_8N1, 26, 22);
     // Serial1.setPins(26, 22, -1, 33);
     // Serial1.setMode(UART_MODE_RS485_HALF_DUPLEX);
-    pinMode(LED_PORT, OUTPUT);
-    LED_ON;
     // SPI.setFrequency(SPI_SPEED );
     // SPI.setBitOrder(LSBFIRST);
     // SPI.setDataMode(SPI_MODE0);
 
-    pinMode(SPICLOCK, OUTPUT);
-    digitalWrite(SPICLOCK, LOW);
     SPI.begin(SPICLOCK, DATAIN_MISO, DATAOUT_MOSI, SEL_MAX14921);
     esp_task_wdt_init(60*10, true);
     esp_task_wdt_add(NULL);

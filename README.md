@@ -1,5 +1,6 @@
-# POSCO Battery Management System
-# 100KVA용 BMS 설치 자재 
+### POSCO Battery Management System
+* modbus PC03 15, 16을 추가한다.
+### 100KVA용 BMS 설치 자재 
 * Main Bms : UPS에 부착하여 출고
 * 센서BMS : 19개 
     - 센서간 연결 UPT Cable : 19개 

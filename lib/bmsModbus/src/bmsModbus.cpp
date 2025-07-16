@@ -17,6 +17,7 @@ void getVersion(int16_t *desc){
 
 
 }
+extern MD_AK35_INSTANCE_T   MD_AK35_obj;
 ModbusMessage BmsModbus::FC03(ModbusMessage request)
 {
   uint16_t address;           // requested register address
@@ -45,6 +46,9 @@ ModbusMessage BmsModbus::FC03(ModbusMessage request)
   sendBuffer[12] = nvmSet.AmpereGain;
   sendBuffer[13] = nvmSet.TotalVoltageOffset;
   sendBuffer[14] = nvmSet.TotalVoltageGain;
+  sendBuffer[15] = MD_AK35_obj.modbusBalanceC01_C08;
+  sendBuffer[16] = MD_AK35_obj.modbusBalanceC09_C16;
+
   // get request values
   request.get(2, address);
   request.get(4, words);
@@ -108,7 +112,7 @@ ModbusMessage BmsModbus::FC06(ModbusMessage request)
   request.get(2, address);
   request.get(4, words);
 
-  if (address  < 15) {
+  if (address  < 17) {
     // Looks okay. Set up message with serverID, FC and length of data
     switch(address){
       case 0:
@@ -145,6 +149,12 @@ ModbusMessage BmsModbus::FC06(ModbusMessage request)
         break;
       case 14:
         nvmSet.TotalVoltageGain = words;
+        break;
+      case 15:
+        MD_AK35_obj.modbusBalanceC01_C08 = words;
+        break;
+      case 16:
+        MD_AK35_obj.modbusBalanceC09_C16 = words;
         break;
       default:
         break;

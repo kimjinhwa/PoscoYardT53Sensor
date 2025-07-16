@@ -525,6 +525,31 @@ uint16_t max14921::readTotalVoltage()
  *
  *------------------------------------------------------------------------------
  */
+float max14921::calTemperature(uint16_t adcData){
+    // ESP_LOGI("MAX14921", "Vntc T%d: %f", Tnumber, Vntc);
+    adcData = adcData + nvmSet.TempOffset;
+    float Vntc = adcData * VREF / 65536.0;
+    // ESP_LOGI("MAX14921", "TNUMBER %d: %3.3f", Tnumber, Vntc);
+    float Rref = 10000.0;
+    float Vt = 3.3;
+    // Rntc = Rref*Vntc/(Vt-Vntc)
+    float Rntc = Rref * Vntc / (Vt - Vntc);
+    // ESP_LOGI("MAX14921", "Rntc T%d: %f", Tnumber, Rntc);
+    float Beta = 3977.0;     //
+    float ntcAt25 = 10000.0; // NTC 10K at 25 degree
+    float T0 = 273.15 + 25;  // 25 degree
+    // Beta parameter formula:
+    // R0 : 10000 ( NTC 10K)
+    // Beta : 3977
+    // R : ADC data derived resistance
+    // T = 1/(1/T0 + 1/Beta)*ln(R/R0)
+    float temperature = 1 / (1 / T0 + (1 / Beta) * log(Rntc / ntcAt25));
+    temperature = temperature - 273.15;
+    if (temperature < -10)
+      temperature = -35;
+
+  return 0.0;
+}
 uint16_t max14921::readT123(T_NUMBER Tnumber)
 {
   uint8_t spiCmd = 0;
@@ -572,29 +597,9 @@ uint16_t max14921::readT123(T_NUMBER Tnumber)
   // Vntc = Vt*Rntc/(Rref+Rntc)
   if (Tnumber == TT1 || Tnumber == TT2)
   {
-    // ESP_LOGI("MAX14921", "Vntc T%d: %f", Tnumber, Vntc);
-    adcData = adcData + nvmSet.TempOffset;
-    float Vntc = adcData * VREF / 65536.0;
-    // ESP_LOGI("MAX14921", "TNUMBER %d: %3.3f", Tnumber, Vntc);
-    float Rref = 10000.0;
-    float Vt = 3.3;
-    // Rntc = Rref*Vntc/(Vt-Vntc)
-    float Rntc = Rref * Vntc / (Vt - Vntc);
-    // ESP_LOGI("MAX14921", "Rntc T%d: %f", Tnumber, Rntc);
-    float Beta = 3977.0;     //
-    float ntcAt25 = 10000.0; // NTC 10K at 25 degree
-    float T0 = 273.15 + 25;  // 25 degree
-    // Beta parameter formula:
-    // R0 : 10000 ( NTC 10K)
-    // Beta : 3977
-    // R : ADC data derived resistance
-    // T = 1/(1/T0 + 1/Beta)*ln(R/R0)
-    float temperature = 1 / (1 / T0 + (1 / Beta) * log(Rntc / ntcAt25));
-    temperature = temperature - 273.15;
-    if (temperature < -10)
-      temperature = -35;
-    T123[Tnumber] = (int)(temperature * 10);
+    float temperature = calTemperature(adcData);
     // ESP_LOGI("MAX14921", "Temperature T%d: %f", Tnumber, temperature);
+    T123[Tnumber] = (int)(temperature * 10);
     return temperature;
   }
   else
@@ -657,6 +662,8 @@ uint16_t max14921::readT123(T_NUMBER Tnumber)
   and ECS -> LOW, if High this is Voltage*16=  Total Voltage
   읽을 때는 둘중에 하나의 상태를 바꾼다.
 */
+static int balanceToggleTest = 0;
+static long readCount = 0;
 void max14921::MD_AK35_Cmd_AcquireCell(uint8_t cellNum,
                               int *pAdcCellVoltage,
                               long *pSpiRxData )
@@ -672,8 +679,25 @@ void max14921::MD_AK35_Cmd_AcquireCell(uint8_t cellNum,
   delayMicroseconds(MD_AK35_LEVEL_SHIFTING_DELAY_MAX);//Datasheet max 50us
   // 현재 SMPLB는 LOW로 되어 있어야 한다.
 
-  MD_AK35_obj.spiBalanceC01_C08 = 0x00;
-	MD_AK35_obj.spiBalanceC09_C16 = 0x00;
+  readCount++;
+  if(readCount % 1000 == 0)
+  {
+    ESP_LOGI("MAX14921", "balanceC01_C08: %02x, balanceC09_C16: %02x", MD_AK35_obj.modbusBalanceC01_C08, MD_AK35_obj.modbusBalanceC09_C16);
+  }
+  MD_AK35_obj.spiBalanceC01_C08 = REVERSE_BITS_8(MD_AK35_obj.modbusBalanceC01_C08);
+  MD_AK35_obj.spiBalanceC09_C16 = REVERSE_BITS_8(MD_AK35_obj.modbusBalanceC09_C16);
+  // if(balanceToggleTest == 0)
+  // {
+  //   MD_AK35_obj.spiBalanceC01_C08 = 0x00;
+  //   MD_AK35_obj.spiBalanceC09_C16 = 0x00;
+  //   balanceToggleTest = 1;
+  // }
+  // else
+  // {
+  //   MD_AK35_obj.spiBalanceC01_C08 = 0xff;
+  //   MD_AK35_obj.spiBalanceC09_C16 = 0xff;
+  //   balanceToggleTest = 0;
+  // }
   if ( cellNum != 0 )
   {
     //
