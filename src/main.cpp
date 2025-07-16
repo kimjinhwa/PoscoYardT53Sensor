@@ -135,9 +135,13 @@ void initPin(){
     pinMode(SPICLOCK, OUTPUT);
     digitalWrite(SPICLOCK, LOW);
 
-    pinMode(ASEL1, INPUT);
-    pinMode(ASEL2, INPUT);
-    pinMode(ASEL3, INPUT);
+    // ASEL 핀들을 INPUT_PULLUP으로 설정
+    pinMode(ASEL1, INPUT_PULLUP);
+    pinMode(ASEL2, INPUT_PULLUP);
+    pinMode(ASEL3, INPUT_PULLUP);
+    
+    // 초기 상태 확인을 위한 디버깅
+    delay(100); // 핀 상태 안정화 대기
 }
 void setup()
 {
@@ -187,6 +191,19 @@ void setup()
     _max14921.initialize();
     useInterrupt();
 }
+uint8_t readModbusAddress(){
+    uint8_t address = 0;
+    if(analogRead(ASEL1) > 1000) address += 1;
+    if(analogRead(ASEL2) > 1000) address += 2;
+    if(digitalRead(ASEL3) == HIGH) address += 4;
+    if(nvmSet.ModbusAddress != address){
+        nvmSet.ModbusAddress = address;
+        EEPROM.writeBytes(0, (byte *)&nvmSet, sizeof(nvmSystemSet));
+        EEPROM.commit();
+        Serial.printf("ModbusAddress Changed to: %d\n", nvmSet.ModbusAddress);
+    }
+    return address;
+}
 void loop()
 {
     esp_task_wdt_reset();
@@ -209,6 +226,12 @@ void loop()
 
     if (currentTime - elaspedTime1000 > EVERY_1000)
     {
+        elaspedTime1000 = currentTime;
+        //ESP_LOGI("MAIN", "ModbusAddress: %d", readModbusAddress());
+        // Serial.printf("ASEL1 (GPIO32): %d\n", analogRead(ASEL1));
+        // Serial.printf("ASEL2 (GPIO25): %d\n", analogRead(ASEL2));
+        // Serial.printf("ASEL3 (GPIO27): %d\n", digitalRead(ASEL3));
+        readModbusAddress();
     }
 
     if (currentTime - elaspedTime2000 > EVERY_2000)

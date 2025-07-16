@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #define LED_PORT GPIO_NUM_15
+// 원래 핀 설정
 #define ASEL1 GPIO_NUM_32
 #define ASEL2 GPIO_NUM_25
 #define ASEL3 GPIO_NUM_27
