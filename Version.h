@@ -1,4 +1,6 @@
-#define VERSION "0.9.1"  // Add Modbus Address rutine using ASEL1, ASEL2, ASEL3 
+#define VERSION "0.9.3"  // Add Modbus Balance Target Voltage 
+//#define VERSION "0.9.2"  // 온도 센서 추가 TH3, TH4, IN_TH 
+//#define VERSION "0.9.1"  // Add Modbus Address rutine using ASEL1, ASEL2, ASEL3 
 //#define VERSION "0.9.0"  // make cell balance and add ASEL1, ASEL2, ASEL3 
 //#define VERSION "1.3.5"  // Hole CT값을 CT Ratio로 사용하기 위하여 변경한다.  CT용량값을 정수로 기입한다.
 //#define VERSION "1.3.4"  // platio 수정 

@@ -143,11 +143,15 @@ void initPin(){
     // 초기 상태 확인을 위한 디버깅
     delay(100); // 핀 상태 안정화 대기
 }
+
+temperatureClass temperature34;
+
 void setup()
 {
     Serial.begin(115200);
     EEPROM.begin(sizeof(nvmSystemSet));
     readAndWriteEprom();
+
     _max14921.SetCellNumber(nvmSet.InstalledCells);
     _max14921.VREF = float(nvmSet.Max1161_RefVolt) / 1000.0;
     Serial.printf("\nVersion: %s\n", VERSION);
@@ -191,6 +195,34 @@ void setup()
     _max14921.initialize();
     useInterrupt();
 }
+#include <esp_adc_cal.h>
+void readTemperature(){
+    uint32_t adc_voltage1;
+    uint32_t adc_voltage2;
+    uint32_t adc_voltage3;
+    esp_adc_cal_characteristics_t adc_chars;
+
+    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+    esp_adc_cal_get_voltage(ADC_CHANNEL_3, &adc_chars, &adc_voltage1);  // IN_TH = GPIO39 = ADC1_CH3
+    esp_adc_cal_get_voltage(ADC_CHANNEL_6, &adc_chars, &adc_voltage2);  // TH3 = GPIO34 = ADC1_CH6
+    esp_adc_cal_get_voltage(ADC_CHANNEL_7, &adc_chars, &adc_voltage3);  // TH4 = GPIO35 = ADC1_CH7
+    // float th1 = analogRead(IN_TH) * 3.3 / 4095.0;
+    // float th2 = analogRead(TH3) * 3.3 / 4095.0;
+    // float th3 = analogRead(TH4) * 3.3 / 4095.0;
+    // ESP_LOGI("MAIN", "TH1: %3.3f(%d):%3.2f, TH2: %3.3f(%d):%3.2f, TH3: %3.3f(%d):%3.2f\n", 
+    //     th1,adc_voltage1, _max14921.calTemperature(adc_voltage1), 
+    //     th2,adc_voltage2, _max14921.calTemperature(adc_voltage2), 
+    //     th3,adc_voltage3, _max14921.calTemperature(adc_voltage3));
+    float tBoard = _max14921.calTemperature(adc_voltage1);
+    float th3 = _max14921.calTemperature(adc_voltage2);
+    float th4 = _max14921.calTemperature(adc_voltage3);
+
+    if (xSemaphoreTake(max14921::dataMutex, portMAX_DELAY) == pdPASS)
+    {
+        temperature34.setTemperature(tBoard, th3, th4);  // 포인터 제거
+        xSemaphoreGive(max14921::dataMutex);
+    }
+}
 uint8_t readModbusAddress(){
     uint8_t address = 0;
     if(analogRead(ASEL1) > 1000) address += 1;
@@ -222,6 +254,8 @@ void loop()
         _max14921.readTotalVoltage();
         _max14921.readT123(TT1);
         _max14921.readT123(TT2);
+
+        readTemperature();
     }
 
     if (currentTime - elaspedTime1000 > EVERY_1000)
@@ -255,6 +289,9 @@ void loop()
         Serial.printf("Tv Diff: %3.3fV ", totalVoltage - 16.0 * _max14921.totalVoltage * _max14921.VREF / 65536.0);
         Serial.printf("\nMax: %3.3fV Min: %3.3fV ", maxVol * _max14921.VREF / 65536.0, minVol * _max14921.VREF / 65536.0);
         Serial.printf("diff : %3.3fV\n\n ", maxVol * _max14921.VREF / 65536.0 - minVol * _max14921.VREF / 65536.0);
+        Serial.printf("\n");
+        ESP_LOGI("MAIN", "IN_TH: %3.2f, TH3: %3.2f, TH4: %3.2f", temperature34.average_temperature_in_th, temperature34.average_temperature_3, temperature34.average_temperature_4);
+        Serial.printf("\n");
         // uint8_t problemCellNum;
         // CellStatus status;
         // elaspedTime2000 = currentTime;

@@ -48,7 +48,8 @@ ModbusMessage BmsModbus::FC03(ModbusMessage request)
   sendBuffer[14] = nvmSet.TotalVoltageGain;
   sendBuffer[15] = MD_AK35_obj.modbusBalanceC01_C08;
   sendBuffer[16] = MD_AK35_obj.modbusBalanceC09_C16;
-
+  sendBuffer[17] = MD_AK35_obj.modbusCanIBalance;
+  sendBuffer[18] = MD_AK35_obj.balanceTargetVoltage;
   // get request values
   request.get(2, address);
   request.get(4, words);
@@ -83,6 +84,9 @@ ModbusMessage BmsModbus::FC04(ModbusMessage request)
     sendBuffer[17] = _max14921.T123[1];
     sendBuffer[18] = _max14921.T123[2]; // current
     sendBuffer[19] = float(nvmSet.InstalledCells) * 10.0 * _max14921.totalVoltage * _max14921.VREF / 65536.0;
+    sendBuffer[20] = (uint16_t)(temperature34.average_temperature_3 * 10);
+    sendBuffer[21] = (uint16_t)(temperature34.average_temperature_4 * 10);
+    sendBuffer[22] = (uint16_t)(temperature34.average_temperature_in_th * 10);
     xSemaphoreGive(max14921::dataMutex);
   }
   // get request values
@@ -112,7 +116,7 @@ ModbusMessage BmsModbus::FC06(ModbusMessage request)
   request.get(2, address);
   request.get(4, words);
 
-  if (address  < 17) {
+  if (address  < 19) {
     // Looks okay. Set up message with serverID, FC and length of data
     switch(address){
       case 0:
@@ -155,6 +159,12 @@ ModbusMessage BmsModbus::FC06(ModbusMessage request)
         break;
       case 16:
         MD_AK35_obj.modbusBalanceC09_C16 = words;
+        break;
+      case 17:
+        MD_AK35_obj.modbusCanIBalance = words;
+        break;
+      case 18:
+        MD_AK35_obj.balanceTargetVoltage = words;
         break;
       default:
         break;

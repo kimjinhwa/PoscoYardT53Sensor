@@ -189,6 +189,7 @@ max14921::max14921(int ADC_CS_pin, int CS_pin, int SAMPLPIN_MAX14921_pin)
 
     initialize();
     initFIFO();
+    MD_AK35_obj.balanceTargetVoltage = 3650;
 }
 void max14921::initialize(){
 	  // disable device to start with
@@ -525,6 +526,24 @@ uint16_t max14921::readTotalVoltage()
  *
  *------------------------------------------------------------------------------
  */
+
+float max14921::calTemperature(uint32_t adcData)
+{
+    int32_t TempVoltage=adcData + nvmSet.TempOffset/1000;
+    float Vntc = TempVoltage/1000.0;
+    float Rref = 10000.0;
+    float Vt = 3.3;
+    float Rntc = Rref * Vntc / (Vt - Vntc);
+    float Beta = 3977.0;     //
+    float ntcAt25 = 10000.0; // NTC 10K at 25 degree
+    float T0 = 273.15 + 25;  // 25 degree
+    float temperature = 1 / (1 / T0 + (1 / Beta) * log(Rntc / ntcAt25));
+    temperature = temperature - 273.15;
+    if (temperature < -10)
+      temperature = -35;
+
+  return temperature;
+}
 float max14921::calTemperature(uint16_t adcData){
     // ESP_LOGI("MAX14921", "Vntc T%d: %f", Tnumber, Vntc);
     adcData = adcData + nvmSet.TempOffset;
@@ -548,7 +567,7 @@ float max14921::calTemperature(uint16_t adcData){
     if (temperature < -10)
       temperature = -35;
 
-  return 0.0;
+  return temperature;
 }
 uint16_t max14921::readT123(T_NUMBER Tnumber)
 {

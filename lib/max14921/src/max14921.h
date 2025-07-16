@@ -102,6 +102,8 @@ typedef struct {
 
   uint8_t   modbusBalanceC01_C08;
   uint8_t   modbusBalanceC09_C16;
+  uint8_t   modbusCanIBalance;
+  uint16_t  balanceTargetVoltage;
   //MD_AK35_USERCFG_T   usrCfg;
 
 } MD_AK35_INSTANCE_T;
@@ -165,6 +167,7 @@ public:
 	void MD_AK35_ScanCell(bool calibrationData);
 	uint16_t readT123(T_NUMBER Tnumber);
   float calTemperature(uint16_t adcData);
+  float calTemperature(uint32_t adcData);
 	uint16_t readTotalVoltage();
 private:
 	long MD_AK35_SpiTransfer24(uint8_t byte1, uint8_t byte2, uint8_t byte3);
