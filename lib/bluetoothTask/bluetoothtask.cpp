@@ -341,7 +341,7 @@ void simpleCliSetup()
 }
 void bluetoothTaskSetup(void)
 {
-    String bleName = "sub";
+    String bleName = "subBmsT53";
     bleName += String(WiFi.macAddress());
     bleName += "_";
     bleName += String(nvmSet.ModbusAddress);

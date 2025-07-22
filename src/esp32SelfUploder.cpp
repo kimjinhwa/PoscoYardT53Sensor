@@ -62,6 +62,7 @@ static void taskLoop(void *pvParameters) {
 void printProgress(size_t prg, size_t sz) {
     static int lastProgress = -1;
     int progress = (prg * 100) / sz;
+    digitalWrite(selfUploder.ledPin, !digitalRead(selfUploder.ledPin) );
     esp_task_wdt_reset();
     if (progress != lastProgress) {
         lastProgress = progress;

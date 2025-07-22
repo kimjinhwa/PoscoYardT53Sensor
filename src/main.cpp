@@ -11,7 +11,8 @@
 #include <esp_task_wdt.h>
 #include "esp32SelfUploder.h"
 #include "../../../version.h"
-
+#include <BluetoothSerial.h>
+extern BluetoothSerial SerialBT;
 
 #define EVERY_100 100
 #define EVERY_200 200
@@ -65,8 +66,8 @@ void readAndWriteEprom(){
   }
 }
 void upLoder(){
-    selfUploder.begin("AndroidHotspot1953", "87654321", "https://raw.githubusercontent.com/kimjinhwa/IP-Fineder-For-ESP32/main/dist/poscot52");
-
+    selfUploder.setLed(LED_PORT);
+    selfUploder.begin("AndroidHotspot1953", "87654321", "https://raw.githubusercontent.com/kimjinhwa/PoscoYardT53Sensor/refs/heads/main/uploadFirmware");
     Serial.println("Booting Sketch...");
     WiFi.mode(WIFI_AP_STA);
     if(strlen(nvmSet.SSID) == 0){
@@ -280,18 +281,24 @@ void loop()
             minVol = min(minVol, _max14921.cellVoltage[index]);
             totalVoltage += _max14921.cellVoltage[index] * _max14921.VREF / 65536.0;
             Serial.printf("%3.3fV ", _max14921.cellVoltage[index] * _max14921.VREF / 65536.0);
+            SerialBT.printf("%3.3fV ", _max14921.cellVoltage[index] * _max14921.VREF / 65536.0);
         }
         Serial.printf("\nT1: %2.1f C ", _max14921.T123[TT1] / 10.0);
+        SerialBT.printf("\nT1: %2.1f C ", _max14921.T123[TT1] / 10.0);
         Serial.printf("T2: %2.1f C ", _max14921.T123[TT2] / 10.0);
+        SerialBT.printf("T2: %2.1f C ", _max14921.T123[TT2] / 10.0);
         Serial.printf("AMP: %2.1fA ", _max14921.T123[AMPERE] / 10.0);
+        SerialBT.printf("AMP: %2.1fA ", _max14921.T123[AMPERE] / 10.0);
         Serial.printf("->TV: %3.3fV ", 16.0 * _max14921.totalVoltage * _max14921.VREF / 65536.0);
-        Serial.printf("TV(sum): %3.3fV ", totalVoltage);
+        SerialBT.printf("TV(sum): %3.3fV ", totalVoltage);
         Serial.printf("Tv Diff: %3.3fV ", totalVoltage - 16.0 * _max14921.totalVoltage * _max14921.VREF / 65536.0);
+        SerialBT.printf("Tv Diff: %3.3fV ", totalVoltage - 16.0 * _max14921.totalVoltage * _max14921.VREF / 65536.0);
         Serial.printf("\nMax: %3.3fV Min: %3.3fV ", maxVol * _max14921.VREF / 65536.0, minVol * _max14921.VREF / 65536.0);
+        SerialBT.printf("\nMax: %3.3fV Min: %3.3fV ", maxVol * _max14921.VREF / 65536.0, minVol * _max14921.VREF / 65536.0);
         Serial.printf("diff : %3.3fV\n\n ", maxVol * _max14921.VREF / 65536.0 - minVol * _max14921.VREF / 65536.0);
-        Serial.printf("\n");
+        SerialBT.printf("\n");
         ESP_LOGI("MAIN", "IN_TH: %3.2f, TH3: %3.2f, TH4: %3.2f", temperature34.average_temperature_in_th, temperature34.average_temperature_3, temperature34.average_temperature_4);
-        Serial.printf("\n");
+        SerialBT.printf("\n");
         // uint8_t problemCellNum;
         // CellStatus status;
         // elaspedTime2000 = currentTime;
