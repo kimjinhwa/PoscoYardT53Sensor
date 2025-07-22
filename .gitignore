@@ -5,7 +5,6 @@
 .vscode/ipch
 test/
 doc/*.obj
-uploadFirmware/*.bin
 max14920-max14921.pdf
 BMS설치메뉴얼.pdf
 *.jpg

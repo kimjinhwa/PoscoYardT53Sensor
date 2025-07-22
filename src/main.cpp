@@ -254,7 +254,7 @@ void loop()
         _max14921.readTotalVoltage();
         _max14921.readT123(TT1);
         _max14921.readT123(TT2);
-
+        _max14921.balance_cells();
         readTemperature();
     }
 

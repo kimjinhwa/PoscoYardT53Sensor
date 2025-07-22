@@ -35,7 +35,7 @@ def get_git_info():
         if os.path.exists(changefirmware):
             print("이름변경 시작")
             # new_name = f"firmware_{pioenv}_{branch_name}{commit_hash}.bin"
-            new_name="firmware_T52.bin"
+            new_name="firmware_T53.bin"
 
             new_path = os.path.join(source_directory, new_name)
             

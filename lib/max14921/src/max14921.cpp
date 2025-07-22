@@ -812,6 +812,31 @@ bool max14921::verifyCalibration() {
     }
     return true;
 }
+void max14921::balance_cells(){
+  if(MD_AK35_obj.modbusCanIBalance == 1) // 밸런싱 활성화명령이 있으면 밸런싱 시작
+  {
+    float balanceVoltage ;
+    if(MD_AK35_obj.balanceTargetVoltage > 0){  // Target Voltage 0이면 밸런싱 비활성화
+      for(int index = 0; index < MD_AK35_obj.acqCellNumber; index++){ // 16개 셀 중에서 밸런싱 대상 셀을 찾는다.
+        balanceVoltage = cellVoltage[index] * VREF / 65536.0;
+        if( index < 8){ // 0~7 셀은 C01_C08 레지스터에 저장
+          if(balanceVoltage > MD_AK35_obj.balanceTargetVoltage/1000.0)
+            MD_AK35_obj.modbusBalanceC01_C08 |= (1 << index);
+          else
+            MD_AK35_obj.modbusBalanceC01_C08 &= ~(1 << index);
+        }
+        else // 8~15 셀은 C09_C16 레지스터에 저장
+        {
+          if(cellVoltage[index] > MD_AK35_obj.balanceTargetVoltage/1000.0)
+            MD_AK35_obj.modbusBalanceC09_C16 |= (1 << index);
+          else
+            MD_AK35_obj.modbusBalanceC09_C16 &= ~(1 << index);
+        }
+      }
+    }
+  }
+}
+
 /**-----------------------------------------------------------------------------
  *
  * Scans thru requested cells and reads ADC data and returns data to PC

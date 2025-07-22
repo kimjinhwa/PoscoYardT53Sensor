@@ -169,6 +169,7 @@ public:
   float calTemperature(uint16_t adcData);
   float calTemperature(uint32_t adcData);
 	uint16_t readTotalVoltage();
+  void balance_cells();
 private:
 	long MD_AK35_SpiTransfer24(uint8_t byte1, uint8_t byte2, uint8_t byte3);
 	void MD_AK35_Cmd_AcquireCell(uint8_t cellNum,
