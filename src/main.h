@@ -40,7 +40,7 @@ typedef struct
   int16_t TempOffset;
   int16_t AmpereOffset;
   uint16_t AmpereGain;
-  uint16_t TotalVoltageOffset;
+  int16_t TotalVoltageOffset;
   uint16_t TotalVoltageGain;
   uint8_t Reserved8;
   char SSID[32];

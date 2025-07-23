@@ -681,8 +681,47 @@ uint16_t max14921::readT123(T_NUMBER Tnumber)
   and ECS -> LOW, if High this is Voltage*16=  Total Voltage
   읽을 때는 둘중에 하나의 상태를 바꾼다.
 */
+bool max14921::canIBalance()
+{
+  if(MD_AK35_obj.modbusCanIBalance == 1)
+  {
+    return true;
+  }
+  return false;
+}
+void max14921::setBalanceC01_C08()
+{
+  MD_AK35_obj.modbusBalanceC01_C08 = 0x00;
+  for (int index = 0; index < 8; index++)
+  {
+    if ((MD_AK35_obj.balanceTargetVoltage) < 1000.0 * (cellVoltage[index] * _max14921.VREF / 65536.0))
+    {
+      ESP_LOGI("MAX14921", "setBalanceC01_C08:0x%02x(%d) ,%d : %3.3fV", 
+        MD_AK35_obj.modbusBalanceC01_C08, index,
+        MD_AK35_obj.balanceTargetVoltage, 
+        1000.0*cellVoltage[index] * _max14921.VREF / 65536.0);
+      MD_AK35_obj.modbusBalanceC01_C08 |= 1 << index;
+    }
+  }
+}
+void max14921::setBalanceC09_C16()
+{
+  MD_AK35_obj.modbusBalanceC09_C16 = 0x00;
+  for (int index = 0; index < 8; index++)
+  {
+    if ((MD_AK35_obj.balanceTargetVoltage) < 1000.0 * (cellVoltage[index] * _max14921.VREF / 65536.0))
+    {
+      ESP_LOGI("MAX14921", "setBalanceC09_C16:0x%02x(%d) ,%d : %3.3fV", 
+        MD_AK35_obj.modbusBalanceC09_C16, index + 8,
+        MD_AK35_obj.balanceTargetVoltage, 
+        1000.0*cellVoltage[index] * _max14921.VREF / 65536.0);
+      MD_AK35_obj.modbusBalanceC09_C16 |= 1 << index;
+    }
+  }
+}
 static int balanceToggleTest = 0;
 static long readCount = 0;
+
 void max14921::MD_AK35_Cmd_AcquireCell(uint8_t cellNum,
                               int *pAdcCellVoltage,
                               long *pSpiRxData )
@@ -753,7 +792,8 @@ void max14921::MD_AK35_Cmd_AcquireCell(uint8_t cellNum,
       pSpiRxData[ cellIndex ] = MD_AK35_SpiTransfer24( MD_AK35_obj.spiBalanceC01_C08,
                                                        MD_AK35_obj.spiBalanceC09_C16,
                                                        spiCmd );
-      delayMicroseconds(50);//Datasheet 5usA
+      //delayMicroseconds(50);//Datasheet 5usA
+      delayMicroseconds(20);//Datasheet 5usA
       uint32_t sumData = 0;  // Changed to uint32_t to prevent overflow
       for(int i = 0; i < 10; i++) {
         sumData += MAX11163_ReadData16();
@@ -761,13 +801,8 @@ void max14921::MD_AK35_Cmd_AcquireCell(uint8_t cellNum,
       pAdcCellVoltage[ cellIndex ] = (int)(sumData / 10);
       pAdcCellVoltage[ cellIndex ] = pAdcCellVoltage[ cellIndex ] + nvmSet.Max1161_CellOffset;
       pAdcCellVoltage[ cellIndex ] = pAdcCellVoltage[ cellIndex ] * nvmSet.Max1161_CellGain/1000;
-      // if(cellIndex==0 )
-      // {
-      //   ESP_LOGI("--->MAX14921", "cellVoltage[%d]: %d", cellIndex, pAdcCellVoltage[cellIndex]*4096/65536);
-      // }
       if (xSemaphoreTake(max14921::dataMutex, portMAX_DELAY) == pdPASS)   
       {
-        //cellVoltage[cellIndex] = pAdcCellVoltage[cellIndex];
         cellVoltage[cellIndex] = updateFIFO(cellIndex, pAdcCellVoltage[cellIndex]);
         xSemaphoreGive(max14921::dataMutex);
       }

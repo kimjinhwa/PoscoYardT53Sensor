@@ -142,6 +142,7 @@ public:
   uint16_t updateFIFO(uint8_t cellNum, uint16_t newvalue);
   uint16_t updateTotalVoltageFIFO(uint16_t newvalue);
   int16_t updateAmpereFIFO(int16_t newvalue);
+  bool canIBalance();
   float VREF;
  	uint16_t cellVoltage[ 16 ]    = { 0 };
   uint16_t hasIssueCell = 0x0000;
@@ -170,6 +171,8 @@ public:
   float calTemperature(uint32_t adcData);
 	uint16_t readTotalVoltage();
   void balance_cells();
+  void setBalanceC01_C08();
+  void setBalanceC09_C16();
 private:
 	long MD_AK35_SpiTransfer24(uint8_t byte1, uint8_t byte2, uint8_t byte3);
 	void MD_AK35_Cmd_AcquireCell(uint8_t cellNum,

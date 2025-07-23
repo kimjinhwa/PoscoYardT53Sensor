@@ -1,4 +1,5 @@
-#define VERSION "0.9.5"  // Bluetooth 출력 기능 추가 
+#define VERSION "0.9.6"  // taget voltage 이상인 셀의 밸런싱 기능을 넣는다.  
+//#define VERSION "0.9.5"  // Bluetooth 출력 기능 추가 
 //#define VERSION "0.9.4"  // 밸런싱 기능 추가 
 //#define VERSION "0.9.3"  // Add Modbus Balance Target Voltage 
 //#define VERSION "0.9.2"  // 온도 센서 추가 TH3, TH4, IN_TH 

@@ -109,8 +109,6 @@ void upLoder(){
     else{
         Serial.println("WiFi connection failed");
     }   
-    // selfUploder.httpUpdater.setup(&selfUploder.httpServer);
-    // selfUploder.httpServer.begin();
     WiFi.disconnect(true);
     WiFi.mode(WIFI_OFF);
     delay(100);
@@ -167,12 +165,6 @@ void setup()
     Serial.printf("GATEWAY: %s\n", IPAddress(nvmSet.GATEWAY).toString().c_str());
     Serial.printf("SUBNETMASK: %s\n", IPAddress(nvmSet.SUBNETMASK).toString().c_str());
     Serial.printf("UseHoleCT Ratio: %d\n", nvmSet.UseHoleCT);
-    // Serial1.begin(9600, SERIAL_8N1, 26, 22);
-    // Serial1.setPins(26, 22, -1, 33);
-    // Serial1.setMode(UART_MODE_RS485_HALF_DUPLEX);
-    // SPI.setFrequency(SPI_SPEED );
-    // SPI.setBitOrder(LSBFIRST);
-    // SPI.setDataMode(SPI_MODE0);
 
     SPI.begin(SPICLOCK, DATAIN_MISO, DATAOUT_MOSI, SEL_MAX14921);
     esp_task_wdt_init(60*10, true);
@@ -207,13 +199,6 @@ void readTemperature(){
     esp_adc_cal_get_voltage(ADC_CHANNEL_3, &adc_chars, &adc_voltage1);  // IN_TH = GPIO39 = ADC1_CH3
     esp_adc_cal_get_voltage(ADC_CHANNEL_6, &adc_chars, &adc_voltage2);  // TH3 = GPIO34 = ADC1_CH6
     esp_adc_cal_get_voltage(ADC_CHANNEL_7, &adc_chars, &adc_voltage3);  // TH4 = GPIO35 = ADC1_CH7
-    // float th1 = analogRead(IN_TH) * 3.3 / 4095.0;
-    // float th2 = analogRead(TH3) * 3.3 / 4095.0;
-    // float th3 = analogRead(TH4) * 3.3 / 4095.0;
-    // ESP_LOGI("MAIN", "TH1: %3.3f(%d):%3.2f, TH2: %3.3f(%d):%3.2f, TH3: %3.3f(%d):%3.2f\n", 
-    //     th1,adc_voltage1, _max14921.calTemperature(adc_voltage1), 
-    //     th2,adc_voltage2, _max14921.calTemperature(adc_voltage2), 
-    //     th3,adc_voltage3, _max14921.calTemperature(adc_voltage3));
     float tBoard = _max14921.calTemperature(adc_voltage1);
     float th3 = _max14921.calTemperature(adc_voltage2);
     float th4 = _max14921.calTemperature(adc_voltage3);
@@ -262,10 +247,6 @@ void loop()
     if (currentTime - elaspedTime1000 > EVERY_1000)
     {
         elaspedTime1000 = currentTime;
-        //ESP_LOGI("MAIN", "ModbusAddress: %d", readModbusAddress());
-        // Serial.printf("ASEL1 (GPIO32): %d\n", analogRead(ASEL1));
-        // Serial.printf("ASEL2 (GPIO25): %d\n", analogRead(ASEL2));
-        // Serial.printf("ASEL3 (GPIO27): %d\n", digitalRead(ASEL3));
         readModbusAddress();
     }
 
@@ -275,10 +256,18 @@ void loop()
         float totalVoltage = 0.0;
         uint16_t maxVol;
         uint16_t minVol=65535;
+        if(_max14921.canIBalance())
+        {
+            _max14921.setBalanceC01_C08();
+            _max14921.setBalanceC09_C16();
+        }
         for (int index = 0; index < nvmSet.InstalledCells; index++)
         {
-            maxVol = max(maxVol, _max14921.cellVoltage[index]);
-            minVol = min(minVol, _max14921.cellVoltage[index]);
+            if(_max14921.cellVoltage[index] * _max14921.VREF / 65536.0 > 0.6)
+            {
+                maxVol = max(maxVol, _max14921.cellVoltage[index]);
+                minVol = min(minVol, _max14921.cellVoltage[index]);
+            }
             totalVoltage += _max14921.cellVoltage[index] * _max14921.VREF / 65536.0;
             Serial.printf("%3.3fV ", _max14921.cellVoltage[index] * _max14921.VREF / 65536.0);
             SerialBT.printf("%3.3fV ", _max14921.cellVoltage[index] * _max14921.VREF / 65536.0);
@@ -299,24 +288,6 @@ void loop()
         SerialBT.printf("\n");
         ESP_LOGI("MAIN", "IN_TH: %3.2f, TH3: %3.2f, TH4: %3.2f", temperature34.average_temperature_in_th, temperature34.average_temperature_3, temperature34.average_temperature_4);
         SerialBT.printf("\n");
-        // uint8_t problemCellNum;
-        // CellStatus status;
-        // elaspedTime2000 = currentTime;
-
-        // if (_max14921.CheckOpenWire())
-        // {
-        //    if (xSemaphoreTake(max14921::dataMutex, portMAX_DELAY) == pdPASS) 
-        //    {
-        //         for (int i = 0; i < nvmSet.InstalledCells; i++)
-        //         {
-        //             _max14921.cellVoltage[i] = 0.0;
-        //         }
-        //         xSemaphoreGive(max14921::dataMutex);
-        //    }
-        //     Serial.printf("\nOpen Wire Problem Cell: %d\n", problemCellNum);
-        //     LED_ON;
-        // }
     }
-    // selfUploder.httpServer.handleClient();
     delay(5);
 }
