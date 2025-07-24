@@ -618,7 +618,10 @@ uint16_t max14921::readT123(T_NUMBER Tnumber)
   {
     float temperature = calTemperature(adcData);
     // ESP_LOGI("MAX14921", "Temperature T%d: %f", Tnumber, temperature);
-    T123[Tnumber] = (int)(temperature * 10);
+    if (xSemaphoreTake(max14921::dataMutex, portMAX_DELAY) == pdPASS){
+      T123[Tnumber] = (int)(temperature * 10);
+      xSemaphoreGive(max14921::dataMutex);
+    }
     return temperature;
   }
   else

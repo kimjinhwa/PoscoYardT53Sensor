@@ -1,8 +1,5 @@
-#define VERSION "0.9.6"  // taget voltage 이상인 셀의 밸런싱 기능을 넣는다.  
-//#define VERSION "0.9.5"  // Bluetooth 출력 기능 추가 
-//#define VERSION "0.9.4"  // 밸런싱 기능 추가 
-//#define VERSION "0.9.3"  // Add Modbus Balance Target Voltage 
-//#define VERSION "0.9.2"  // 온도 센서 추가 TH3, TH4, IN_TH 
+#define VERSION "0.9.7"  // 가장높은 온도센서 2개만 서버에 올려준다>  
+//#define VERSION "0...2"  // 온도 센서 추가 TH3, TH4, IN_TH 
 //#define VERSION "0.9.1"  // Add Modbus Address rutine using ASEL1, ASEL2, ASEL3 
 //#define VERSION "0.9.0"  // make cell balance and add ASEL1, ASEL2, ASEL3 
 //#define VERSION "1.3.5"  // Hole CT값을 CT Ratio로 사용하기 위하여 변경한다.  CT용량값을 정수로 기입한다.

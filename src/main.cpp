@@ -238,10 +238,17 @@ void loop()
         else LED_TOGGLE;
         _max14921.MD_AK35_ScanCell(false);
         _max14921.readTotalVoltage();
+        readTemperature();
         _max14921.readT123(TT1);
         _max14921.readT123(TT2);
+
+        /* 기존 포스코 프로그램과 맞추기 위하여 온도데이타는 총4개를 읽지만 그중 가장 높은 값 2개만 사용한다.*/
+        if (xSemaphoreTake(max14921::dataMutex, portMAX_DELAY) == pdPASS){
+            _max14921.T123[TT1] = max(_max14921.T123[TT1],int(temperature34.average_temperature_3*10.0));
+            _max14921.T123[TT2] = max(_max14921.T123[TT2],int(temperature34.average_temperature_4*10.0));
+            xSemaphoreGive(max14921::dataMutex);
+        }
         _max14921.balance_cells();
-        readTemperature();
     }
 
     if (currentTime - elaspedTime1000 > EVERY_1000)
