@@ -195,7 +195,7 @@ void BmsModbus::FC06_Broadcast(ModbusMessage request)
     return;
   }
 
-  if (address  < 13) {
+  if (address  < 19) {
     // Looks okay. Set up message with serverID, FC and length of data
     switch(address){
       case 0:
@@ -226,6 +226,24 @@ void BmsModbus::FC06_Broadcast(ModbusMessage request)
         break;
       case 12:
         nvmSet.AmpereGain = words;
+        break;
+      case 13:
+        nvmSet.TotalVoltageOffset = words;
+        break;
+      case 14:
+        nvmSet.TotalVoltageGain = words;
+        break;
+      case 15:
+        MD_AK35_obj.modbusBalanceC01_C08 = words;
+        break;
+      case 16:
+        MD_AK35_obj.modbusBalanceC09_C16 = words;
+        break;
+      case 17:
+        MD_AK35_obj.modbusCanIBalance = words;
+        break;
+      case 18:
+        MD_AK35_obj.balanceTargetVoltage = words;
         break;
       default:
         break;

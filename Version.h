@@ -1,4 +1,5 @@
-#define VERSION "0.9.7"  // 가장높은 온도센서 2개만 서버에 올려준다>  
+#define VERSION "0.9.8"  // multicasting  부분 변경 
+//#define VERSION "0.9.7"  // 가장높은 온도센서 2개만 서버에 올려준다>  
 //#define VERSION "0...2"  // 온도 센서 추가 TH3, TH4, IN_TH 
 //#define VERSION "0.9.1"  // Add Modbus Address rutine using ASEL1, ASEL2, ASEL3 
 //#define VERSION "0.9.0"  // make cell balance and add ASEL1, ASEL2, ASEL3 

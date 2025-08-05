@@ -699,7 +699,7 @@ void max14921::setBalanceC01_C08()
   {
     if ((MD_AK35_obj.balanceTargetVoltage) < 1000.0 * (cellVoltage[index] * _max14921.VREF / 65536.0))
     {
-      ESP_LOGI("MAX14921", "setBalanceC01_C08:0x%02x(%d) ,%d : %3.3fV", 
+      ESP_LOGI("MAX14921", "setBalanceC01_C08:0x%02x(%02d) ,%d : %3.3fV", 
         MD_AK35_obj.modbusBalanceC01_C08, index,
         MD_AK35_obj.balanceTargetVoltage, 
         1000.0*cellVoltage[index] * _max14921.VREF / 65536.0);
@@ -714,7 +714,7 @@ void max14921::setBalanceC09_C16()
   {
     if ((MD_AK35_obj.balanceTargetVoltage) < 1000.0 * (cellVoltage[index] * _max14921.VREF / 65536.0))
     {
-      ESP_LOGI("MAX14921", "setBalanceC09_C16:0x%02x(%d) ,%d : %3.3fV", 
+      ESP_LOGI("MAX14921", "setBalanceC09_C16:0x%02x(%02d) ,%d : %3.3fV", 
         MD_AK35_obj.modbusBalanceC09_C16, index + 8,
         MD_AK35_obj.balanceTargetVoltage, 
         1000.0*cellVoltage[index] * _max14921.VREF / 65536.0);
