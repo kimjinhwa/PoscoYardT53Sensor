@@ -68,7 +68,7 @@ void readAndWriteEprom(){
 void upLoder(){
     selfUploder.setLed(LED_PORT);
     selfUploder.begin("AndroidHotspot1953", "87654321", "https://raw.githubusercontent.com/kimjinhwa/PoscoYardT53Sensor/refs/heads/main/uploadFirmware");
-    Serial.println("Booting Sketch...");
+    Serial.println("Booting Sketch..");
     WiFi.mode(WIFI_AP_STA);
     if(strlen(nvmSet.SSID) == 0){
         strncpy(nvmSet.SSID, selfUploder.ssid, sizeof(nvmSet.SSID));
